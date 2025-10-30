@@ -1,0 +1,11 @@
+run = "npm run replit-start"
+language = "nodejs"
+hidden = ["node_modules", "dist"]
+
+[nix]
+channel = "stable-24.05"
+
+[env]
+# Replit provides PORT automatically; this is a fallback
+PORT = "3000"
+

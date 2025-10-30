@@ -156,8 +156,3 @@ Based on `AlgoCareBoxPackIntegration.md`, the next steps include:
 
 - The current implementation uses dummy data for streak tracking (as per POC requirements)
 - Wallet integration is set up but not fully connected to NFT minting yet
-- All components are mobile-responsive and follow the original HTML design
-
-## License
-
-Private - CareBox Pack Development Team
