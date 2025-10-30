@@ -178,7 +178,7 @@ export default function HomeView ({ onNavigate }: HomeViewProps) {
     {
       emoji: '✨',
       title: 'Acne Control Routine',
-      subtitle: '1 morning step\n1 evening step'
+      subtitle: '7 morning step\n6 evening step'
     },
     {
       emoji: '🍃',
