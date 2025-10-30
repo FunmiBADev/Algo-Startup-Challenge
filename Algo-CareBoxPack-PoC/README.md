@@ -152,10 +152,6 @@ Based on `AlgoCareBoxPackIntegration.md`, the next steps include:
    - Connect Pera/Defly wallets
    - Handle wallet state and transactions
 
-4. **Streak Simulation Replacement**:
-   - Replace dummy streak data with real backend integration
-   - Connect to actual wellness tracking service
-
 ## Development Notes
 
 - The current implementation uses dummy data for streak tracking (as per POC requirements)
