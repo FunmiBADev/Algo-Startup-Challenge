@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Base Styles */
+body {
+  font-family: 'Inter', sans-serif;
+  transition: all 0.5s ease;
+  color: #e0e0e0;
+}
+
+/* Navigation Shell (Sidebar and Bottom Nav) */
+.nav-shell {
+  transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease;
+  backdrop-filter: blur(8px);
+}
+
+/* Dark Mode: Text is light gray/white, background is dark semi-transparent */
+body[data-theme='dark'] .nav-shell {
+  background-color: rgba(15, 23, 42, 0.5);
+  color: #d1d5db;
+  border-color: #374151;
+}
+
+/* Light Mode: Text is light gray/white (FIXED), background is light transparent overlay */
+body[data-theme='light'] .nav-shell {
+  background-color: rgba(25, 25, 45, 0.15);
+  color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* Main Content Cards (Card-Bg) */
+.card-bg {
+  transition: background-color 0.5s ease, box-shadow 0.5s ease;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+}
+
+/* Dark Mode: Text is light gray/white, background is dark semi-transparent */
+body[data-theme='dark'] .card-bg {
+  background-color: rgba(31, 41, 55, 0.7);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Light Mode: Text is light gray/white (FIXED), background is light transparent overlay */
+body[data-theme='light'] .card-bg {
+  background-color: rgba(25, 25, 45, 0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #f3f4f6;
+}
+
+/* Inner Content (e.g., list items, appointment prep box) */
+.inner-card-bg {
+  transition: background-color 0.5s ease;
+}
+
+/* Dark Mode: Slightly reduced opacity */
+body[data-theme='dark'] .inner-card-bg {
+  background-color: rgba(17, 24, 39, 0.8);
+}
+
+/* Light Mode: Text is light gray/white (FIXED), background is very light transparent overlay */
+body[data-theme='light'] .inner-card-bg {
+  background-color: rgba(25, 25, 45, 0.08);
+  color: #f3f4f6;
+}
+
+/* Desktop Sidebar Menu Item Styling */
+.sidebar-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover states for Light Mode must use light/white overlay */
+body[data-theme='light'] .sidebar-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Active link states for Light Mode must use light/white overlay */
+body[data-theme='light'] .sidebar-menu-item.active-link {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+/* Mobile Bottom Nav Styling */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* Ensure active link text is bright in both modes (FIXED for Light Mode) */
+body[data-theme='dark'] .nav-item.active-link {
+  color: #fff;
+  font-weight: 600;
+}
+
+body[data-theme='light'] .nav-item.active-link {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* View Control Utility */
+.hidden-view {
+  display: none !important;
+}
+
+/* Achievement Card Specific Styling */
+.achievement-card {
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.achievement-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-content {
+  background-color: #1a1a2e;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* Loading Spinner */
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #38bdf8;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
