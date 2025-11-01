@@ -77,6 +77,8 @@ All documentation is organised in the `docs/` directory:
 - **[1-airdrop-setup.md](docs/1-airdrop-setup.md)** - Complete airdrop system setup
 - **[2-nft-integration-complete.md](docs/2-nft-integration-complete.md)** - NFT integration status and testing guide
 - **[3-poc-status.md](docs/3-poc-status.md)** - Current POC implementation status
+- **[4-vercel-deployment.md](docs/4-vercel-deployment.md)** - Vercel deployment guide
+- See [docs/README.md](docs/README.md) for full documentation index
 
 ## 🏗️ Project Structure
 
@@ -96,7 +98,8 @@ Algo-CareBoxPack-PoC/
 │   ├── 0-wallet-mnemonic-setup.md
 │   ├── 1-airdrop-setup.md
 │   ├── 2-nft-integration-complete.md
-│   └── 3-poc-status.md
+│   ├── 3-poc-status.md
+│   └── 4-vercel-deployment.md
 ├── README.md               # This file
 └── backend/README.md       # Backend setup guide
 ```
@@ -124,30 +127,30 @@ Algo-CareBoxPack-PoC/
 - ARC-3 NFT standard
 - Pera & Defly wallets
 
-## 🌐 Replit Deployment
+## 🌐 Deployment
 
-The project is configured for one-click Replit deployment:
+### Vercel Deployment (Recommended)
 
-```toml
-# .replit
-run = "npm run replit-start:full"
-```
+**Free, production-ready deployment with automatic HTTPS and CDN.**
 
-The frontend automatically detects Replit URLs and connects to the backend.
+The project is configured for Vercel deployment:
 
-### Analytics
+1. Push your code to GitHub
+2. Import project in Vercel: https://vercel.com
+3. Add environment variables (see deployment guide)
+4. Deploy automatically on git push
 
-Replit Analytics are **automatically enabled** for your repl. Access them at:
+**See [4-vercel-deployment.md](docs/4-vercel-deployment.md) for complete setup instructions.**
 
-`https://replit.com/@your-username/your-repl-slug/analytics`
+Features:
 
-The dashboard provides:
-
-- Page views and unique visitors
-- Top URLs and referrers
-- Geographic distribution
-- Browser/device statistics
-- Request errors and duration
+- ✅ Automatic HTTPS
+- ✅ Global CDN
+- ✅ Serverless functions for backend
+- ✅ Environment variable management
+- ✅ Preview deployments per branch
+- ✅ Built-in analytics
+- ✅ Custom domain support
 
 ## 🎮 Testing the POC
 

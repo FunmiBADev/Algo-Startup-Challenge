@@ -1,7 +1,0 @@
-run = "npm run replit-start"
-language = "nodejs"
-hidden = ["node_modules", "dist", "backend/node_modules"]
-
-[nix]
-channel = "stable-23_11"
-
