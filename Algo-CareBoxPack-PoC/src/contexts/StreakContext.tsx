@@ -25,6 +25,8 @@ interface StreakContextType {
   getArchiveYears: () => number[]
   getArchivedBadges: (year: number) => Set<number>
   getArchivedReached: (year: number) => Set<number>
+  hasReceivedOnboardingAirdrop: () => boolean
+  markOnboardingAirdropReceived: () => void
 }
 
 const StreakContext = createContext<StreakContextType | undefined>(undefined)
@@ -113,6 +115,14 @@ export function StreakProvider ({ children }: StreakProviderProps) {
     () => {
       const stored = localStorage.getItem(`reachedMilestones_${currentYear}`)
       return stored ? new Set<number>(JSON.parse(stored)) : new Set<number>()
+    }
+  )
+
+  // Track onboarding airdrop status (permanent across all years)
+  const [hasOnboardingAirdrop, setHasOnboardingAirdrop] = useState<boolean>(
+    () => {
+      const stored = localStorage.getItem('hasReceivedOnboardingAirdrop')
+      return stored === 'true'
     }
   )
 
@@ -308,6 +318,17 @@ export function StreakProvider ({ children }: StreakProviderProps) {
     return stored ? new Set<number>(JSON.parse(stored)) : new Set<number>()
   }
 
+  // Check if user has received onboarding airdrop
+  const hasReceivedOnboardingAirdrop = () => {
+    return hasOnboardingAirdrop
+  }
+
+  // Mark onboarding airdrop as received (permanent across all years)
+  const markOnboardingAirdropReceived = () => {
+    setHasOnboardingAirdrop(true)
+    localStorage.setItem('hasReceivedOnboardingAirdrop', 'true')
+  }
+
   return (
     <StreakContext.Provider
       value={{
@@ -323,7 +344,9 @@ export function StreakProvider ({ children }: StreakProviderProps) {
         getAchievementsStatus,
         getArchiveYears,
         getArchivedBadges,
-        getArchivedReached
+        getArchivedReached,
+        hasReceivedOnboardingAirdrop,
+        markOnboardingAirdropReceived
       }}
     >
       {children}

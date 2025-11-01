@@ -1,158 +1,195 @@
-# CareBox Pack - Wellness Dashboard (Algorand Blockchain POC)
+# CareBox Pack - Algorand Wellness NFT POC
 
-A mobile-responsive TypeScript React web application that serves as the foundation for Algorand blockchain integration, featuring wellness tracking, achievement badges, and NFT claiming capabilities.
+A mobile-responsive TypeScript React web application demonstrating Algorand blockchain integration for wellness tracking, achievement badges, and NFT claiming with automatic ALGO airdrops.
 
-## Features
+## 🎯 What This POC Demonstrates
 
-- **Mobile-Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Theme System**: Light/Dark mode with dynamic time-based gradient backgrounds
-- **Achievement Tracking**: Streak-based wellness milestones with NFT badge claiming
-- **Wallet Integration**: Ready for Algorand wallet integration (Pera, Defly, KMD)
-- **Modern Tech Stack**: React 18, TypeScript, Vite, Tailwind CSS
+- **Automatic ALGO Airdrops**: First-time users receive 0.5 ALGO for wallet activation
+- **ARC-3 Compliant NFTs**: Achievement badges as verifiable on-chain rewards
+- **Year-Based Achievements**: Streak tracking that resets annually with archive system
+- **Seamless UX**: No blockchain knowledge required for wellness users
+- **Real Wallet Integration**: Pera & Defly wallet support with TestNet deployment
 
-## Tech Stack
-
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **@txnlab/use-wallet-react** for Algorand wallet integration
-- **Context API** for state management (Theme, Streak)
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── Dashboard.tsx              # Main layout component
-│   ├── navigation/                # Navigation components
-│   │   ├── Sidebar.tsx            # Desktop sidebar
-│   │   └── BottomNav.tsx          # Mobile bottom navigation
-│   ├── views/                     # View components
-│   │   ├── HomeView.tsx           # Home dashboard
-│   │   ├── SettingsView.tsx      # Settings page
-│   │   ├── AchievementsView.tsx   # Achievement badges grid
-│   │   └── ThemeSettingsView.tsx  # Theme customization
-│   └── modals/
-│       └── ClaimModal.tsx         # NFT claiming modal
-├── contexts/                      # React contexts
-│   ├── ThemeContext.tsx           # Theme state management
-│   └── StreakContext.tsx          # Streak simulation state
-├── types/                         # TypeScript types
-│   └── index.ts
-├── utils/                         # Utility functions
-│   └── theme.ts                   # Theme utilities
-├── constants/                     # Constants
-│   └── achievements.ts            # Achievement definitions
-├── styles/
-│   └── main.css                   # Global styles
-└── App.tsx                        # Root component
-```
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js >= 20.0
 - npm >= 9.0
+- Pinata account (for IPFS)
+- TestNet wallet (Pera or Defly)
 
 ### Installation
 
-1. Install dependencies:
-
 ```bash
+# Install dependencies
 npm install
+
+# Install backend dependencies
+npm run backend:install
 ```
 
-2. Start the development server:
+### Configuration
+
+1. **Frontend Setup**:
+
+   ```bash
+   cp .env.template .env
+   # Edit .env with your TestNet configuration
+   ```
+
+2. **Backend Setup**:
+   ```bash
+   cd backend
+   cp .env.template .env
+   # Edit .env with Pinata credentials and funded wallet mnemonic
+   cd ..
+   ```
+
+See [backend/README.md](backend/README.md) for detailed backend configuration.
+
+### Run the Application
 
 ```bash
+# Start both frontend and backend
+npm run dev:full
+```
+
+This starts:
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3001`
+
+Or run separately:
+
+```bash
+# Terminal 1: Frontend
 npm run dev
+
+# Terminal 2: Backend
+npm run backend:dev
 ```
 
-The app will be available at `http://localhost:5173`
+## 📚 Documentation
 
-### Building for Production
+All documentation is organised in the `docs/` directory:
 
-```bash
-npm run build
+- **[0-wallet-mnemonic-setup.md](docs/0-wallet-mnemonic-setup.md)** - How to set up the funded wallet
+- **[1-airdrop-setup.md](docs/1-airdrop-setup.md)** - Complete airdrop system setup
+- **[2-nft-integration-complete.md](docs/2-nft-integration-complete.md)** - NFT integration status and testing guide
+- **[3-poc-status.md](docs/3-poc-status.md)** - Current POC implementation status
+
+## 🏗️ Project Structure
+
+```
+Algo-CareBoxPack-PoC/
+├── src/                      # Frontend React application
+│   ├── components/          # UI components
+│   ├── contexts/            # State management
+│   ├── services/            # NFT & blockchain services
+│   ├── config/              # Configuration files
+│   └── ...
+├── backend/                 # Express.js backend
+│   ├── app.js              # Main server
+│   ├── airdropService.js   # ALGO airdrop logic
+│   └── ...
+├── docs/                    # Documentation
+│   ├── 0-wallet-mnemonic-setup.md
+│   ├── 1-airdrop-setup.md
+│   ├── 2-nft-integration-complete.md
+│   └── 3-poc-status.md
+├── README.md               # This file
+└── backend/README.md       # Backend setup guide
 ```
 
-The built files will be in the `dist/` directory.
+## 🔧 Tech Stack
 
-### Preview Production Build
+### Frontend
 
-```bash
-npm run preview
+- React 18 + TypeScript
+- Vite for building
+- Tailwind CSS for styling
+- `@txnlab/use-wallet-react` for wallet integration
+- Framer Motion for animations
+
+### Backend
+
+- Express.js
+- Pinata SDK for IPFS
+- AlgoSDK for blockchain transactions
+- CORS-enabled API
+
+### Blockchain
+
+- Algorand TestNet
+- ARC-3 NFT standard
+- Pera & Defly wallets
+
+## 🌐 Replit Deployment
+
+The project is configured for one-click Replit deployment:
+
+```toml
+# .replit
+run = "npm run replit-start:full"
 ```
 
-## Configuration
+The frontend automatically detects Replit URLs and connects to the backend.
 
-### Environment Variables
+### Analytics
 
-Create a `.env` file in the root directory:
+Replit Analytics are **automatically enabled** for your repl. Access them at:
 
-```env
-VITE_ALGOD_NETWORK=testnet
-VITE_ALGOD_SERVER=https://testnet-api.algonode.cloud
-VITE_ALGOD_PORT=443
-VITE_ALGOD_TOKEN=
-```
+`https://replit.com/@your-username/your-repl-slug/analytics`
 
-For local development:
+The dashboard provides:
 
-```env
-VITE_ALGOD_NETWORK=localnet
-```
+- Page views and unique visitors
+- Top URLs and referrers
+- Geographic distribution
+- Browser/device statistics
+- Request errors and duration
 
-### Security Notes
+## 🎮 Testing the POC
 
-The project includes npm package overrides to address security vulnerabilities in transitive dependencies (specifically the `ws` package used by wallet connectors). The override ensures a safe version of `ws` (7.5.10) is used, resolving DoS vulnerabilities in older versions.
+1. Set your streak to 10 days using the POC dropdown
+2. Navigate to Achievements view
+3. Click "Claim NFT Badge" on the 10-day badge
+4. Connect Pera or Defly wallet
+5. Approve the transaction
+6. Verify NFT in your wallet
 
-Some vulnerabilities may still appear in `npm audit` reports from older wallet dependencies (`@blockshake/defly-connect`, `@perawallet/connect`). These are in transitive dependencies and do not affect runtime security once the override is applied.
+## 📋 Key Features
 
-**Note**: After installing dependencies, the `ws` override should significantly reduce the number of vulnerabilities. The remaining moderate vulnerabilities are typically in development dependencies and do not affect production builds.
+- **Onboarding Airdrop**: Automatic 0.5 ALGO for first-time users
+- **Duplicate Prevention**: Smart tracking prevents abuse
+- **Toast Notifications**: Real-time user feedback
+- **Wallet Management**: Visible connection status with disconnect option
+- **IPFS Integration**: Decentralised image and metadata storage
+- **TestNet Ready**: Full integration with Algorand TestNet
 
-## Features Overview
+## 🔐 Security Notes
 
-### Theme System
+- `.env` files are gitignored; never commit secrets
+- Funded wallet mnemonic stored securely in backend `.env`
+- npm overrides applied for security vulnerabilities
+- CORS configured for safe cross-origin requests
 
-- Light and Dark modes
-- Dynamic gradient backgrounds that change based on time of day
-- Theme preference persisted in localStorage
+## 📞 Support
 
-### Achievement System
+For issues or questions:
 
-- 6 milestone badges (10, 30, 60, 90, 180, 365 days)
-- Three badge states: Locked, Claim-Pending, Claimed
-- NFT claiming modal with transaction simulation
-- Streak simulation for POC testing
+- Check [backend/README.md](backend/README.md) for backend setup
+- Review docs in `docs/` directory
+- Verify environment variables are configured correctly
 
-### Navigation
+## 🎓 Algorand Resources
 
-- Desktop: Sidebar navigation
-- Mobile: Bottom navigation bar
-- View-based routing system
+- TestNet Faucet: https://bank.testnet.algorand.network/
+- TestNet Explorer: https://testnet.explorer.algorand.org/
+- Pinata Dashboard: https://app.pinata.cloud/pinmanager
+- Algorand Docs: https://developer.algorand.org/
 
-## Next Steps for Algorand Integration
+## 📄 License
 
-Based on `AlgoCareBoxPackIntegration.md`, the next steps include:
-
-1. **Smart Contract Integration**:
-
-   - OnboardingRewards contract for first-time user rewards
-   - AchievementTracker contract (optional)
-
-2. **NFT Minting Service**:
-
-   - Pinata IPFS integration for metadata storage
-   - ARC-3 compliant NFT creation
-
-3. **Wallet Connection**:
-
-   - Connect Pera/Defly wallets
-   - Handle wallet state and transactions
-
-## Development Notes
-
-- The current implementation uses dummy data for streak tracking (as per POC requirements)
-- Wallet integration is set up but not fully connected to NFT minting yet
+This is a POC for the Algorand Startup Challenge.
