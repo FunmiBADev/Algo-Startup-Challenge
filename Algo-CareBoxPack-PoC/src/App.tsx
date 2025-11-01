@@ -7,61 +7,71 @@ import {
 } from '@txnlab/use-wallet-react'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { StreakProvider } from './contexts/StreakContext'
+import { ToastProvider, useToast } from './contexts/ToastContext'
+import ToastContainer from './components/ui/Toast'
 import Dashboard from './components/Dashboard'
+import {
+  getAlgodConfigFromViteEnvironment,
+  getKmdConfigFromViteEnvironment
+} from './utils/network/getAlgoClientConfigs'
 
-// For now, we'll configure for TestNet by default
-// This can be enhanced later to detect environment
-const algodConfig = {
-  network: 'testnet' as const,
-  server: 'https://testnet-api.algonode.cloud',
-  port: 443,
-  token: ''
+function AppWithToasts () {
+  const { toasts, removeToast } = useToast()
+
+  return (
+    <>
+      <Dashboard />
+      <ToastContainer toasts={toasts} onClose={removeToast} />
+    </>
+  )
 }
 
 let supportedWallets: SupportedWallet[]
 if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
-  // LocalNet configuration would go here
+  const kmdConfig = getKmdConfigFromViteEnvironment()
   supportedWallets = [
     {
       id: WalletId.KMD,
       options: {
-        baseServer: 'http://localhost',
-        token: '',
-        port: '4002'
+        baseServer: kmdConfig.server,
+        token: String(kmdConfig.token),
+        port: String(kmdConfig.port)
       }
     }
   ]
 } else {
-  supportedWallets = [{ id: WalletId.DEFLY }, { id: WalletId.PERA }]
+  supportedWallets = [{ id: WalletId.PERA }, { id: WalletId.DEFLY }]
 }
 
-const walletManager = new WalletManager({
-  wallets: supportedWallets,
-  defaultNetwork: algodConfig.network,
-  networks: {
-    [algodConfig.network]: {
-      algod: {
-        baseServer: algodConfig.server,
-        port: algodConfig.port,
-        token: String(algodConfig.token)
-      }
-    }
-  },
-  options: {
-    resetNetwork: true
-  }
-})
+export default function App () {
+  const algodConfig = getAlgodConfigFromViteEnvironment()
 
-function App () {
+  const walletManager = new WalletManager({
+    wallets: supportedWallets,
+    defaultNetwork: algodConfig.network,
+    networks: {
+      [algodConfig.network]: {
+        algod: {
+          baseServer: algodConfig.server,
+          port: algodConfig.port,
+          token: String(algodConfig.token)
+        }
+      }
+    },
+    options: {
+      resetNetwork: true
+    }
+  })
+
   return (
     <WalletProvider manager={walletManager}>
       <ThemeProvider>
         <StreakProvider>
-          <Dashboard />
+          <ToastProvider>
+            <AppWithToasts />
+          </ToastProvider>
         </StreakProvider>
       </ThemeProvider>
     </WalletProvider>
   )
 }
-
-export default App

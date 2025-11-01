@@ -15,6 +15,12 @@ import {
 import { FaTrophy } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaAward } from 'react-icons/fa'
+import { useWallet } from '@txnlab/use-wallet-react'
+import {
+  getAchievementTypeByMilestone,
+  getBadgeConfig,
+  CURRENT_YEAR
+} from '../../config/achievementBadges'
 
 interface AchievementsViewProps {
   onNavigate: (view: ViewId) => void
@@ -32,9 +38,28 @@ export default function AchievementsView ({
     getArchivedBadges,
     getArchivedReached
   } = useStreak()
+  const { activeAddress, wallets } = useWallet()
   const [showClaimModal, setShowClaimModal] = useState(false)
   const [selectedDays, setSelectedDays] = useState(0)
   const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set())
+
+  // Helper to ellipse address
+  const ellipseAddress = (address: string, width = 6): string => {
+    return `${address.slice(0, width)}...${address.slice(-width)}`
+  }
+
+  // Handle wallet disconnect
+  const handleDisconnect = async () => {
+    if (wallets) {
+      const activeWallet = wallets.find(w => w.isActive)
+      if (activeWallet) {
+        await activeWallet.disconnect()
+      } else {
+        localStorage.removeItem('@txnlab/use-wallet:v3')
+        window.location.reload()
+      }
+    }
+  }
 
   // DEMO: Hardcoded archive years for testing (2024 and 2023)
   const demoArchiveYears = [2024, 2023]
@@ -71,14 +96,37 @@ export default function AchievementsView ({
     })
   }
 
+  // Helper to get IPFS image URL for a badge
+  const getBadgeImageUrl = (milestone: number, year: number): string | null => {
+    const achievementType = getAchievementTypeByMilestone(milestone)
+    if (!achievementType) return null
+
+    const badgeConfig = getBadgeConfig(achievementType, year)
+    if (!badgeConfig) return null
+
+    // Convert ipfs:// to HTTP gateway URL
+    const ipfsUrl = badgeConfig.imageUrl
+    if (!ipfsUrl || !ipfsUrl.startsWith('ipfs://')) return null
+
+    // Use Pinata gateway or public gateway
+    // ipfs://bafybeihmv5ec4bimu5yld5wfadc7a6yurlbkpnimiv7uq3ti54eejrwkze/10DaysGetStartedPOC.png
+    // Keep the full path for directory structures
+    const ipfsPath = ipfsUrl.replace('ipfs://', '')
+    return `https://gateway.pinata.cloud/ipfs/${ipfsPath}`
+  }
+
   const renderBadge = (
     achievement: typeof ACHIEVEMENTS[0],
     index: number,
-    badgeStatus?: 'locked' | 'claimable' | 'claimed'
+    badgeStatus?: 'locked' | 'claimable' | 'claimed',
+    year?: number
   ) => {
     const status = badgeStatus || getBadgeStatus(achievement.days)
+    const displayYear = year || currentYear
 
     if (status === 'claimed') {
+      const badgeImageUrl = getBadgeImageUrl(achievement.days, displayYear)
+
       return (
         <motion.div
           key={achievement.days}
@@ -90,10 +138,25 @@ export default function AchievementsView ({
         >
           <div className='absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50' />
           <div className='relative z-10'>
-            <div className='h-16 flex items-center justify-center mb-4'>
-              <span className='text-6xl filter drop-shadow-lg'>
-                {achievement.icon}
-              </span>
+            <div className='h-48 flex items-center justify-center mb-4'>
+              {badgeImageUrl ? (
+                <img
+                  src={badgeImageUrl}
+                  alt={`${achievement.name} NFT`}
+                  className='max-h-full max-w-full object-contain drop-shadow-lg rounded-lg'
+                  onError={e => {
+                    // Fallback to emoji if image fails to load
+                    console.error('Failed to load badge image:', badgeImageUrl)
+                    const target = e.target as HTMLImageElement
+                    target.style.display = 'none'
+                    target.parentElement!.innerHTML = `<span class='text-6xl filter drop-shadow-lg'>${achievement.icon}</span>`
+                  }}
+                />
+              ) : (
+                <span className='text-6xl filter drop-shadow-lg'>
+                  {achievement.icon}
+                </span>
+              )}
             </div>
             <div className={`text-xl font-bold ${achievement.color} mb-2`}>
               {achievement.name} NFT
@@ -196,6 +259,37 @@ export default function AchievementsView ({
         <span>Back to Settings</span>
       </motion.button>
 
+      {/* Wallet Connection Status Bar */}
+      {activeAddress && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='card-bg p-4 rounded-xl border border-green-500/30 bg-gradient-to-r from-green-900/30 to-emerald-900/30'
+        >
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-3'>
+              <div className='w-3 h-3 rounded-full bg-green-500 animate-pulse' />
+              <div>
+                <div className='text-sm font-semibold text-green-400'>
+                  Wallet Connected
+                </div>
+                <div className='text-xs text-gray-300 font-mono'>
+                  {ellipseAddress(activeAddress)}
+                </div>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleDisconnect}
+              className='px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-lg transition-colors'
+            >
+              Disconnect
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -294,7 +388,8 @@ export default function AchievementsView ({
                             return renderBadge(
                               achievement,
                               index,
-                              archivedStatus
+                              archivedStatus,
+                              year
                             )
                           })}
                         </div>

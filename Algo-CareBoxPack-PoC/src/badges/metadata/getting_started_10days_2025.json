@@ -1,0 +1,35 @@
+{
+  "name": "Getting Started NFT 2025",
+  "description": "Achievement badge for completing a 10-day wellness streak in CareBox Pack - 2025 POC",
+  "image": "ipfs://bafybeihmv5ec4bimu5yld5wfadc7a6yurlbkpnimiv7uq3ti54eejrwkze/10DaysGetStartedPOC.png",
+  "attributes": [
+    {
+      "trait_type": "Achievement Type",
+      "value": "Getting Started"
+    },
+    {
+      "trait_type": "Streak Duration",
+      "value": "10 Days"
+    },
+    {
+      "trait_type": "Year",
+      "value": "2025"
+    },
+    {
+      "trait_type": "Colour Theme",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Category",
+      "value": "Consistency"
+    }
+  ],
+  "properties": {
+    "application": "CareBox Pack",
+    "type": "Achievement Badge",
+    "milestone": 10,
+    "year": 2025,
+    "colour_theme": "blue"
+  }
+}
+
