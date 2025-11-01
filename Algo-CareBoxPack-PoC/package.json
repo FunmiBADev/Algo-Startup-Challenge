@@ -9,13 +9,13 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev:full": "npm run backend:install && concurrently -k -n FRONTEND,BACKEND -c auto \"npm run dev\" \"npm run backend:dev\"",
+    "dev:full": "concurrently -k -n FRONTEND,BACKEND -c auto \"npm run dev\" \"npm run backend:dev\"",
     "backend:install": "cd backend && npm install",
     "backend:dev": "cd backend && npm run dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "replit-start": "npm run build && vite preview --host 0.0.0.0 --port $PORT",
-    "replit-start:full": "npm run backend:install && npm run build && concurrently -k -n FRONTEND,BACKEND -c auto \"vite preview --host 0.0.0.0 --port $PORT\" \"cd backend && npm run dev\"",
+    "replit-start": "concurrently -k -n FRONTEND,BACKEND -c auto \"npm run dev\" \"npm run backend:dev\"",
+    "replit-start:full": "concurrently -k -n FRONTEND,BACKEND -c auto \"npm run dev\" \"npm run backend:dev\"",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix"
   },
