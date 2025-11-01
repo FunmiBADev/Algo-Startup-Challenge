@@ -242,7 +242,7 @@ export default function HomeView ({ onNavigate }: HomeViewProps) {
         {/* POC Mode: Dropdown for Streak Testing */}
         <div className='mb-4 p-3 rounded-lg bg-white/5 border border-white/10'>
           <label className='text-xs text-gray-400 block mb-2'>
-            🎯 POC Mode: Test Achievement Unlocks
+            🎯 Simulate Achievement Unlock Flow
           </label>
           <select
             value={selectedMilestone}
@@ -263,7 +263,7 @@ export default function HomeView ({ onNavigate }: HomeViewProps) {
             <option value={365}>365 Days - Annual Legend</option>
           </select>
           <p className='text-xs text-gray-500 mt-2'>
-            Select a milestone to instantly test achievement badge unlocks
+            Select a milestone to instantly simulate achievement badge unlocks
           </p>
         </div>
 

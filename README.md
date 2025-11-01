@@ -11,18 +11,7 @@ A mobile-responsive TypeScript React web application demonstrating Algorand bloc
 - Year-based achievements with annual reset and archive system
 - Seamless UX requiring no blockchain knowledge
 
-**Current State**: Fully functional with separate frontend and backend deployments on Vercel.
-
-## Recent Changes
-
-### 2025-11-01: Vercel Deployment & Architecture Changes
-
-- Migrated from Replit to Vercel for production deployment
-- Separated frontend and backend into independent projects
-- Backend deployed as separate Vercel project with serverless functions
-- Frontend connects to backend via `VITE_API_URL` environment variable
-- Removed Replit-specific configurations and dependencies
-- Updated all documentation to reflect new deployment architecture
+**Current State**: Fully functional with separate frontend and backend deployments.
 
 ## Project Architecture
 
@@ -168,7 +157,6 @@ See `docs/4-vercel-deployment.md` for detailed deployment instructions.
 - ✅ Achievement badge system (6 tiers: 10, 30, 60, 90, 180, 365 days)
 - ✅ NFT claiming with blockchain transactions
 - ✅ Automatic ALGO airdrops for new users
-- ✅ Duplicate airdrop prevention
 - ✅ Toast notifications for user feedback
 - ✅ IPFS integration via Pinata
 - ✅ Mobile-responsive design
