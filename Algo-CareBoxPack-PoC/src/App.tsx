@@ -1,4 +1,5 @@
 import React from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import {
   SupportedWallet,
   WalletId,
@@ -69,6 +70,7 @@ export default function App () {
         <StreakProvider>
           <ToastProvider>
             <AppWithToasts />
+            <Analytics />
           </ToastProvider>
         </StreakProvider>
       </ThemeProvider>
