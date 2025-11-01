@@ -13,13 +13,13 @@ Demonstrate automatic ALGO airdrop for non-blockchain users claiming their first
 - Persists across all years and sessions
 - **Status**: ✅ Complete and tested
 
-### 2. Backend Airdrop Service (`Algo-NFT-Server/algo-nft-backend/backend/airdropService.js`)
+### 2. Backend Airdrop Service ([algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend)/backend/airdropService.js)
 
 - Sends 0.5 ALGO from funded wallet to recipient
 - Transaction signing and broadcasting
 - **Status**: ✅ Complete, deployed on Vercel
 
-### 3. Backend API (`Algo-NFT-Server/algo-nft-backend/backend/app.js`)
+### 3. Backend API ([algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend)/backend/app.js)
 
 - `GET /` and `GET /health` - Health check endpoints
 - `POST /api/airdrop` - Send airdrop to address

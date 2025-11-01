@@ -45,7 +45,7 @@ A mobile-responsive TypeScript React web application demonstrating Algorand bloc
 This project consists of **two separate repositories**:
 
 1. **Frontend**: `Algo-CareBoxPack-PoC/`
-2. **Backend**: `Algo-NFT-Server/algo-nft-backend/` (separate GitHub repo)
+2. **Backend**: [algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend)
 
 #### Frontend Directory
 
@@ -64,10 +64,10 @@ Algo-CareBoxPack-PoC/
 └── vite.config.ts           # Vite build configuration
 ```
 
-#### Backend Directory
+#### Backend Directory (from [algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend))
 
 ```
-Algo-NFT-Server/algo-nft-backend/
+algo-nft-backend/
 ├── backend/
 │   ├── app.js              # Express app & routes
 │   ├── airdropService.js   # ALGO airdrop logic
@@ -97,7 +97,7 @@ VITE_API_URL=https://algo-nft-backend.vercel.app
 
 **Local Development**: Set `VITE_API_URL=http://localhost:3001`
 
-### Backend (Algo-NFT-Server/algo-nft-backend/backend/.env)
+### Backend ([algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend)/backend/.env)
 
 **Required Environment Variables**:
 
@@ -122,7 +122,9 @@ VITE_API_URL=https://algo-nft-backend.vercel.app
 **Start Backend**:
 
 ```bash
-cd Algo-NFT-Server/algo-nft-backend/backend
+# Clone the backend repository
+git clone https://github.com/FunmiBADev/algo-nft-backend.git
+cd algo-nft-backend/backend
 npm install
 npm run dev
 # Backend runs on http://localhost:3001
@@ -182,7 +184,7 @@ Detailed documentation available in `Algo-CareBoxPack-PoC/docs/`:
 - **[3-poc-status.md](docs/3-poc-status.md)** - Current implementation status
 - **[4-vercel-deployment.md](docs/4-vercel-deployment.md)** - Vercel deployment guide
 
-Backend documentation in `Algo-NFT-Server/algo-nft-backend/backend/README.md`
+Backend documentation: [algo-nft-backend README](https://github.com/FunmiBADev/algo-nft-backend)
 
 ## API Endpoints
 

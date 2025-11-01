@@ -6,7 +6,7 @@ This guide explains how to deploy the CareBox Pack POC to Vercel with separate f
 
 1. GitHub account with your code in two repositories:
    - Frontend: `Algo-CareBoxPack-PoC`
-   - Backend: `algo-nft-backend` (in `Algo-NFT-Server` directory)
+   - Backend: [algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend)
 2. Vercel account (sign up at https://vercel.com - free)
 3. Completed backend setup:
    - Pinata JWT for IPFS storage
@@ -34,13 +34,12 @@ This architecture provides:
 #### 1.1 Push Backend to GitHub
 
 ```bash
-cd Algo-NFT-Server/algo-nft-backend
-git init  # if not already initialized
+# Clone the backend repository if not already cloned
+git clone https://github.com/FunmiBADev/algo-nft-backend.git
+cd algo-nft-backend
 git add .
 git commit -m "Ready for Vercel deployment"
-# Push to your GitHub repository
-git remote add origin https://github.com/your-username/algo-nft-backend.git
-git push -u origin main
+git push origin main
 ```
 
 #### 1.2 Deploy Backend to Vercel
@@ -400,7 +399,9 @@ Perfect for production-ready demos and projects.
 ### Backend
 
 ```bash
-cd Algo-NFT-Server/algo-nft-backend/backend
+# Clone and setup backend
+git clone https://github.com/FunmiBADev/algo-nft-backend.git
+cd algo-nft-backend/backend
 npm install
 npm run dev
 # Backend runs on http://localhost:3001

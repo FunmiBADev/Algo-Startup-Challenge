@@ -18,7 +18,7 @@ This directory contains comprehensive project documentation.
 
 - **Main README**: [../README.md](../README.md) - Project overview
 - **Frontend Project**: `Algo-CareBoxPack-PoC/` - React/Vite application
-- **Backend Project**: `Algo-NFT-Server/algo-nft-backend/` - Express.js serverless API
+- **Backend Project**: [algo-nft-backend](https://github.com/FunmiBADev/algo-nft-backend) - Express.js serverless API
 
 ## Document Overview
 
@@ -54,7 +54,7 @@ Both projects are deployed independently for better scaling and isolation.
 
 1. Read the [Main README](../README.md) for project overview
 2. Set up backend: [1-airdrop-setup.md](1-airdrop-setup.md)
-3. Configure frontend: [Backend README](../../../Algo-NFT-Server/algo-nft-backend/backend/README.md)
+3. Configure frontend: [Backend README](https://github.com/FunmiBADev/algo-nft-backend)
 4. Deploy to Vercel: [4-vercel-deployment.md](4-vercel-deployment.md)
 5. Test POC: [3-poc-status.md](3-poc-status.md)
 
