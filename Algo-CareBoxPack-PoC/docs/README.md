@@ -10,6 +10,8 @@ This directory contains all project documentation.
 
 3. **[3-poc-status.md](3-poc-status.md)** - Current POC implementation status and demo preparation
 
+4. **[4-replit-env-setup.md](4-replit-env-setup.md)** - How to configure environment variables in Replit Secrets
+
 ## Quick Links
 
 - Main README: [../README.md](../README.md)
