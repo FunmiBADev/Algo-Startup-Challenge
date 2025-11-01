@@ -1,55 +1,70 @@
 # Vercel Deployment Guide
 
-This guide explains how to deploy the CareBox Pack POC to Vercel (free hosting with automatic HTTPS).
+This guide explains how to deploy the CareBox Pack POC to Vercel with separate frontend and backend projects.
 
 ## Prerequisites
 
-1. GitHub account with your code pushed to a repository
+1. GitHub account with your code in two repositories:
+   - Frontend: `Algo-CareBoxPack-PoC`
+   - Backend: `algo-nft-backend` (in `Algo-NFT-Server` directory)
 2. Vercel account (sign up at https://vercel.com - free)
 3. Completed backend setup:
    - Pinata JWT for IPFS storage
    - Funded wallet mnemonic for airdrops
 
+## Architecture Overview
+
+The project uses **separate deployments** for frontend and backend:
+
+- **Frontend**: React/Vite static site deployed on Vercel
+- **Backend**: Express.js serverless functions deployed on Vercel
+- **Connection**: Frontend connects to backend via `VITE_API_URL` environment variable
+
+This architecture provides:
+
+- Independent scaling
+- Separate GitHub repositories
+- Isolated environment variables
+- Faster frontend deployments
+
 ## Deployment Steps
 
-### 1. Push Your Code to GitHub
+### Part 1: Deploy Backend
 
-If you haven't already:
+#### 1.1 Push Backend to GitHub
 
 ```bash
+cd Algo-NFT-Server/algo-nft-backend
+git init  # if not already initialized
 git add .
 git commit -m "Ready for Vercel deployment"
-git push origin main
+# Push to your GitHub repository
+git remote add origin https://github.com/your-username/algo-nft-backend.git
+git push -u origin main
 ```
 
-### 2. Connect to Vercel
+#### 1.2 Deploy Backend to Vercel
 
 1. Go to https://vercel.com and sign in
 2. Click **"Add New..."** → **"Project"**
-3. Import your GitHub repository
-4. Vercel will auto-detect Vite configuration
+3. Import your `algo-nft-backend` repository
+4. Vercel will auto-detect configuration from `vercel.json`
 
-### 3. Configure Project Settings
+#### 1.3 Configure Backend Settings
 
-Vercel will show configuration. Use these settings:
-
-**Framework Preset:** `Vite` (auto-detected)
+**Framework Preset:** `Other` or auto-detected from `vercel.json`
 
 **Build and Output Settings:**
 
-- Build Command: `npm run build` (default)
-- Output Directory: `dist` (default)
-- Install Command: `npm install && cd backend && npm install`
+- Build Command: (None - serverless functions)
+- Output Directory: `.`
+- Install Command: `cd backend && npm install`
 
 **Root Directory:** Leave as `.` (root)
 
-### 4. Add Environment Variables
+#### 1.4 Add Backend Environment Variables
 
-Click **"Environment Variables"** to add secrets:
-
-#### Backend Variables
-
-Add these **exact names**:
+Click **"Environment Variables"** and add:
 
 **`PINATA_JWT`** (Required)
 
@@ -87,9 +102,76 @@ https://testnet-api.algonode.cloud
 *
 ```
 
-#### Frontend Variables (Optional)
+> **Important:** After adding variables, select **"Production", "Preview", and "Development"** for each one.
 
-Only add if you need custom Algorand network config:
+#### 1.5 Deploy Backend
+
+1. Click **"Deploy"**
+2. Wait for build to complete (typically 1-2 minutes)
+3. Note the deployment URL: `https://algo-nft-backend.vercel.app`
+4. Test the health endpoint: `https://algo-nft-backend.vercel.app/health`
+
+Expected response:
+
+```json
+{
+  "ok": true,
+  "ts": 1234567890123
+}
+```
+
+### Part 2: Deploy Frontend
+
+#### 2.1 Push Frontend to GitHub
+
+```bash
+cd Algo-Startup-Challenge/Algo-CareBoxPack-PoC
+git init  # if not already initialized
+git add .
+git commit -m "Ready for Vercel deployment"
+# Push to your GitHub repository
+git remote add origin https://github.com/your-username/algo-careboxpack-poc.git
+git push -u origin main
+```
+
+#### 2.2 Deploy Frontend to Vercel
+
+1. Go to https://vercel.com and sign in
+2. Click **"Add New..."** → **"Project"**
+3. Import your `algo-careboxpack-poc` repository
+4. Vercel will auto-detect Vite configuration
+
+#### 2.3 Configure Frontend Settings
+
+**Framework Preset:** `Vite` (auto-detected)
+
+**Build and Output Settings:**
+
+- Build Command: `npm run build` (default)
+- Output Directory: `dist` (default)
+- Install Command: `npm install`
+
+**Root Directory:** Leave as `.` (root)
+
+#### 2.4 Add Frontend Environment Variables
+
+Click **"Environment Variables"** and add:
+
+**`VITE_API_URL`** (Required)
+
+```
+https://algo-nft-backend.vercel.app
+```
+
+Replace with your actual backend URL from Part 1.
+
+**Algorand Network Variables** (Optional - has defaults):
+
+**`VITE_ALGOD_NETWORK`**
+
+```
+testnet
+```
 
 **`VITE_ALGOD_SERVER`**
 
@@ -103,23 +185,29 @@ https://testnet-api.algonode.cloud
 443
 ```
 
-**`VITE_ALGOD_NETWORK`**
+**`VITE_INDEXER_SERVER`** (Optional)
 
 ```
-testnet
+https://testnet-idx.algonode.cloud
+```
+
+**`VITE_INDEXER_PORT`** (Optional)
+
+```
+443
 ```
 
 > **Important:** After adding variables, select **"Production", "Preview", and "Development"** for each one.
 
-### 5. Deploy
+#### 2.5 Deploy Frontend
 
 1. Click **"Deploy"**
-2. Wait for build to complete (typically 2-5 minutes)
-3. Vercel will provide a URL like: `https://your-project-name.vercel.app`
+2. Wait for build to complete (typically 2-3 minutes)
+3. Vercel will provide a URL: `https://algo-careboxpack-poc.vercel.app`
 
-### 6. Test Your Deployment
+### Part 3: Test Complete System
 
-1. Visit the provided URL
+1. Visit your frontend URL
 2. Connect your wallet (Pera or Defly)
 3. Try claiming a badge to test:
    - Airdrop (10-day badge for first-time users)
@@ -128,35 +216,61 @@ testnet
 
 ## Configuration Files
 
-### `vercel.json`
+### Backend: `algo-nft-backend/vercel.json`
 
-This project includes a `vercel.json` that:
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "backend/index.js"
+    }
+  ]
+}
+```
 
-- Routes `/api/*` requests to backend functions
-- Configures backend as Node.js 20.x runtime
-- Sets up proper build and install commands
+### Frontend: `Algo-CareBoxPack-PoC/vercel.json`
 
-No changes needed unless you want to customise deployment.
+```json
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "vite"
+}
+```
 
-### Environment Detection
+## Environment Detection
 
-The frontend automatically detects Vercel deployment and routes API calls to `/api/*` instead of `localhost:3001`.
+The frontend automatically connects to the backend via `VITE_API_URL`:
+
+- **Production**: Uses `VITE_API_URL` from Vercel environment variables
+- **Local Development**: Uses `http://localhost:3001` if `VITE_API_URL` is set locally
 
 See `src/components/modals/ClaimModal.tsx` for the `resolveBackendBase()` logic.
 
 ## Troubleshooting
 
-### Build Fails
-
-**Error:** "Missing dependencies"
-
-**Solution:** Ensure `backend/package.json` has all required dependencies. The install command runs `npm install` in both root and backend directories.
+### Backend Build Fails
 
 **Error:** "Cannot find module '@pinata/sdk'"
 
-**Solution:** Check that backend dependencies are properly installed. Vercel should handle this automatically.
+**Solution:** Check that `backend/package.json` has all required dependencies. Vercel should install them automatically from the `backend/` directory.
 
-### Airdrop Fails
+**Error:** "Module not found"
+
+**Solution:** Verify `vercel.json` points to `backend/index.js` as the entry point.
+
+### Backend Airdrop Fails
 
 **Error:** "Failed to send airdrop"
 
@@ -166,17 +280,27 @@ See `src/components/modals/ClaimModal.tsx` for the `resolveBackendBase()` logic.
 2. Check wallet has sufficient TestNet ALGOs
 3. Verify mnemonic is 25 words, Algorand-format
 4. Check deployment logs in Vercel dashboard for specific errors
+5. Visit `https://your-backend.vercel.app/health` to verify backend is running
 
-### NFT Minting Fails
+### Frontend Can't Connect to Backend
 
-**Error:** "Failed to pin image to IPFS"
+**Error:** "Failed to fetch" or "Network error"
 
 **Checks:**
 
-1. Verify `PINATA_JWT` is set correctly in Vercel environment variables
-2. Confirm JWT token is valid and not expired
-3. Check Pinata account is active
-4. Review Vercel function logs for detailed errors
+1. Verify `VITE_API_URL` is set correctly in frontend environment variables
+2. Ensure backend is deployed and accessible
+3. Test backend health endpoint directly: `curl https://your-backend.vercel.app/health`
+4. Check browser console for specific error messages
+5. Verify CORS is working (backend allows all origins by default)
+
+### CORS Errors
+
+**Error:** "Access to fetch blocked by CORS policy"
+
+**Solution:** Backend already configured to allow all origins (`ALLOWED_ORIGINS=*`). If you encounter this, check that environment variable is set in backend Vercel project.
+
+### NFT Minting Fails
 
 **Error:** "Transaction signing failed"
 
@@ -185,6 +309,16 @@ See `src/components/modals/ClaimModal.tsx` for the `resolveBackendBase()` logic.
 1. User must connect a wallet (Pera or Defly)
 2. User must approve transaction in wallet popup
 3. Check browser console for wallet connection errors
+4. Verify TestNet configuration is correct
+
+**Error:** "Failed to pin image to IPFS"
+
+**Checks:**
+
+1. Verify `PINATA_JWT` is set correctly in backend Vercel environment variables
+2. Confirm JWT token is valid and not expired
+3. Check Pinata account is active
+4. Review backend Vercel function logs for detailed errors
 
 ### Images Not Loading
 
@@ -197,47 +331,44 @@ See `src/components/modals/ClaimModal.tsx` for the `resolveBackendBase()` logic.
 3. Check if Pinata gateway is working: `https://gateway.pinata.cloud/ipfs/...`
 4. Ensure metadata was uploaded to Pinata correctly
 
-### CORS Errors
-
-**Error:** "Access to fetch blocked by CORS policy"
-
-**Solution:** Backend already configured to allow all origins (`ALLOWED_ORIGINS=*`). If you encounter this, check that environment variable is set in Vercel.
-
 ## Monitoring
 
 ### Vercel Dashboard
 
-Access your project dashboard:
+Access your project dashboards:
 
-- **URL:** https://vercel.com/your-username/your-project
-- View deployments, logs, analytics
-- Update environment variables
-- Configure custom domains
+- **Backend**: https://vercel.com/your-username/algo-nft-backend
+- **Frontend**: https://vercel.com/your-username/algo-careboxpack-poc
+
+View deployments, logs, analytics, update environment variables, and configure custom domains.
 
 ### Function Logs
 
-1. Go to Vercel dashboard
-2. Click on your project
-3. Navigate to **"Functions"** tab
-4. Select a function (e.g., `/api/airdrop`)
-5. View real-time logs
+**Backend Logs:**
 
-### Frontend Logs
+1. Go to Vercel dashboard → Backend project
+2. Navigate to **"Functions"** tab
+3. Select a function (e.g., `/api/airdrop`)
+4. View real-time logs
 
-Browser console will show:
+**Frontend Logs:**
 
-- Wallet connection status
-- NFT minting progress
-- Toast notifications
-- Error messages
+1. Browser console will show:
+   - Wallet connection status
+   - NFT minting progress
+   - Toast notifications
+   - Error messages
+2. Vercel dashboard → Frontend project → **"Deployments"** → View build logs
 
-## Custom Domain (Optional)
+## Custom Domains (Optional)
 
 1. Go to Vercel dashboard → Your project → Settings
 2. Click **"Domains"**
 3. Add your custom domain
 4. Follow DNS configuration instructions
 5. Enable automatic SSL certificates
+
+Works for both frontend and backend independently.
 
 ## CI/CD
 
@@ -247,6 +378,8 @@ Vercel automatically redeploys when you push to GitHub:
 - **Other branches** → Preview deployments
 
 Each branch gets its own URL and can have different environment variables.
+
+**Note:** When you update the backend, you may want to deploy the frontend to clear any cached references.
 
 ## Cost
 
@@ -262,6 +395,27 @@ Vercel Hobby Plan (free) includes:
 
 Perfect for production-ready demos and projects.
 
+## Local Development with Separate Projects
+
+### Backend
+
+```bash
+cd Algo-NFT-Server/algo-nft-backend/backend
+npm install
+npm run dev
+# Backend runs on http://localhost:3001
+```
+
+### Frontend
+
+```bash
+cd Algo-Startup-Challenge/Algo-CareBoxPack-PoC
+npm install
+# Set VITE_API_URL=http://localhost:3001 in .env
+npm run dev
+# Frontend runs on http://localhost:5173
+```
+
 ## Additional Resources
 
 - Vercel Documentation: https://vercel.com/docs
@@ -275,6 +429,7 @@ After successful deployment:
 
 1. **Test all features** thoroughly
 2. **Monitor function logs** for errors
-3. **Set up custom domain** if desired
-4. **Share your demo** with the provided URL
+3. **Set up custom domains** if desired
+4. **Share your demo** with the provided URLs
 5. **Add analytics** if needed (Vercel provides basic analytics)
+6. **Update environment variables** as needed via Vercel dashboard

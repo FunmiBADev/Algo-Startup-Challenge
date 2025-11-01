@@ -39,3 +39,7 @@ yarn-error.log*
 # Temp
 *.tmp
 .temp
+
+# Private documentation
+*PRIVATE.md
+docs/*PRIVATE*
