@@ -3,15 +3,20 @@ import { ViewId } from '../../types'
 
 interface SettingsViewProps {
   onNavigate: (view: ViewId) => void
+  onShowOnboarding?: () => void
 }
 
-export default function SettingsView ({ onNavigate }: SettingsViewProps) {
+export default function SettingsView ({
+  onNavigate,
+  onShowOnboarding
+}: SettingsViewProps) {
   const settingsItems = [
     { icon: 'purple', label: 'My Account', view: 'home' as ViewId },
     {
       icon: 'green',
       label: 'Restart how to use CareBox Pack',
-      view: 'home' as ViewId
+      view: 'home' as ViewId,
+      action: 'onboarding' as const
     },
     { icon: 'yellow', label: 'Achievements', view: 'achievements' as ViewId },
     { icon: 'pink', label: 'Theme', view: 'themeSettings' as ViewId },
@@ -84,7 +89,17 @@ export default function SettingsView ({ onNavigate }: SettingsViewProps) {
           <div
             key={index}
             className='flex items-center justify-between p-3 rounded-lg hover:bg-opacity-70 cursor-pointer'
-            onClick={() => onNavigate(item.view)}
+            onClick={() => {
+              if (
+                'action' in item &&
+                item.action === 'onboarding' &&
+                onShowOnboarding
+              ) {
+                onShowOnboarding()
+              } else {
+                onNavigate(item.view)
+              }
+            }}
           >
             <div className='flex items-center space-x-4'>
               <svg
