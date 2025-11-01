@@ -74,7 +74,6 @@ npm run backend:dev
 
 All documentation is organised in the `docs/` directory:
 
-- **[0-wallet-mnemonic-setup.md](docs/0-wallet-mnemonic-setup.md)** - How to set up the funded wallet
 - **[1-airdrop-setup.md](docs/1-airdrop-setup.md)** - Complete airdrop system setup
 - **[2-nft-integration-complete.md](docs/2-nft-integration-complete.md)** - NFT integration status and testing guide
 - **[3-poc-status.md](docs/3-poc-status.md)** - Current POC implementation status
@@ -167,13 +166,6 @@ The dashboard provides:
 - **Wallet Management**: Visible connection status with disconnect option
 - **IPFS Integration**: Decentralised image and metadata storage
 - **TestNet Ready**: Full integration with Algorand TestNet
-
-## 🔐 Security Notes
-
-- `.env` files are gitignored; never commit secrets
-- Funded wallet mnemonic stored securely in backend `.env`
-- npm overrides applied for security vulnerabilities
-- CORS configured for safe cross-origin requests
 
 ## 📞 Support
 
