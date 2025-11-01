@@ -19,8 +19,14 @@ function resolveBackendBase (): string {
   const env = import.meta.env.VITE_API_URL?.trim()
   if (env) return env.replace(/\/$/, '')
 
-  // 2) Replit: convert current host to port 3001
+  // 2) Vercel: Backend API routes to /api/*
   const host = window.location.host
+  if (host.endsWith('.vercel.app') || host.endsWith('.vercel.sh')) {
+    // Vercel deployments: backend is at same origin, /api path
+    return `${window.location.origin}/api`
+  }
+
+  // 3) Replit: convert current host to port 3001
   if (host.endsWith('.replit.dev') || host.endsWith('.repl.co')) {
     // Replit URLs are like: https://your-project.your-username.repl.co
     // Backend runs on same host, different port
@@ -28,13 +34,13 @@ function resolveBackendBase (): string {
     return `${protocol}//${host.replace(/(:\d+)?$/, ':3001')}`
   }
 
-  // 3) Codespaces: convert current host to port 3001
+  // 4) Codespaces: convert current host to port 3001
   if (host.endsWith('.app.github.dev')) {
     const base = host.replace(/-\d+\.app\.github\.dev$/, '-3001.app.github.dev')
     return `https://${base}`
   }
 
-  // 4) Plain local fallback
+  // 5) Plain local fallback
   return 'http://localhost:3001'
 }
 
