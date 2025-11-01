@@ -2,23 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "devCommand": "npm run dev:full",
+  "devCommand": "npm run dev",
   "installCommand": "npm install",
-  "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ],
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  "framework": "vite"
 }
-

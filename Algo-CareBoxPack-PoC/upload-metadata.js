@@ -3,7 +3,8 @@
  * Run: node upload-metadata.js
  */
 
-require('dotenv').config({ path: './backend/.env' })
+// NOTE: Update this path to point to your backend .env file
+require('dotenv').config({ path: '../algo-nft-backend/backend/.env' })
 const fs = require('fs')
 const path = require('path')
 const FormData = require('form-data')
@@ -13,7 +14,7 @@ const PINATA_JWT = process.env.PINATA_JWT
 const PINATA_UPLOAD_URL = 'https://api.pinata.cloud/pinning/pinFileToIPFS'
 
 if (!PINATA_JWT) {
-  console.error('❌ Error: PINATA_JWT not found in backend/.env')
+  console.error('❌ Error: PINATA_JWT not found. Make sure you have the backend .env file configured.')
   process.exit(1)
 }
 
