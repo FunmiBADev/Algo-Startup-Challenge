@@ -15,11 +15,57 @@ interface ClaimModalProps {
 }
 
 function resolveBackendBase (): string {
-  // Use environment variable for backend URL
+  // In development mode, prefer localhost backend
+  const isDev = import.meta.env.DEV || import.meta.env.MODE === 'development'
+
+  // Check for explicit local override
+  const localOverride = import.meta.env.VITE_API_URL_LOCAL?.trim()
+  if (isDev && localOverride) {
+    console.log('🔧 Using local backend override:', localOverride)
+    return localOverride.replace(/\/$/, '')
+  }
+
+  // In dev mode, if VITE_API_URL points to a remote URL, use localhost instead
   const env = import.meta.env.VITE_API_URL?.trim()
+  if (isDev && env) {
+    try {
+      const url = new URL(env)
+      // If it's a remote URL (not localhost/127.0.0.1), use localhost for dev
+      if (
+        url.hostname !== 'localhost' &&
+        url.hostname !== '127.0.0.1' &&
+        !url.hostname.startsWith('192.168.')
+      ) {
+        const localPort = import.meta.env.VITE_API_PORT || '3001'
+        const localUrl = `http://localhost:${localPort}`
+        console.log(
+          '🔧 Development mode detected - using local backend:',
+          localUrl
+        )
+        console.log('   (Original VITE_API_URL points to:', env, ')')
+        return localUrl
+      }
+    } catch (e) {
+      // If URL parsing fails, use as-is
+      console.warn('⚠️  Could not parse VITE_API_URL, using as-is:', env)
+    }
+  }
+
+  // Use environment variable for backend URL (production or explicit local)
   if (!env) {
+    // Fallback to localhost in dev if no env var
+    if (isDev) {
+      const localPort = import.meta.env.VITE_API_PORT || '3001'
+      const localUrl = `http://localhost:${localPort}`
+      console.log(
+        '🔧 Development mode - using default local backend:',
+        localUrl
+      )
+      return localUrl
+    }
     throw new Error('VITE_API_URL environment variable is required')
   }
+
   return env.replace(/\/$/, '')
 }
 
@@ -44,7 +90,7 @@ export default function ClaimModal ({
     try {
       // Check if wallet is connected
       if (!activeAddress || !transactionSigner) {
-        console.error('❌ Wallet not connected')
+        console.warn('❌ Wallet not connected')
         setError('Please connect your wallet first')
         showToast('Please connect your wallet first', 'error')
         return
@@ -67,13 +113,28 @@ export default function ClaimModal ({
         console.log('📤 Sending airdrop...')
         showToast('Sending onboarding reward (0.5 ALGO)...', 'info')
         const backendBase = resolveBackendBase()
+
+        // Get device information
+        const userAgent = navigator.userAgent
+        const isMobile =
+          /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            userAgent
+          )
+        const deviceInfo = {
+          deviceName: navigator.platform || 'Unknown',
+          deviceType: isMobile ? 'Mobile' : 'Desktop'
+        }
+        console.log('📱 Device info:', deviceInfo)
+
         const response = await fetch(`${backendBase}/api/airdrop`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            recipientAddress: activeAddress
+            recipientAddress: activeAddress,
+            deviceName: deviceInfo.deviceName,
+            deviceType: deviceInfo.deviceType
           })
         })
 
@@ -95,11 +156,20 @@ export default function ClaimModal ({
       }
 
       // Step 2: Mint the NFT badge
-      console.log('🎨 Starting NFT mint process...')
+      console.log('\n🎨 ========== NFT MINT PROCESS START ==========')
+      console.log('📊 Parameters:')
+      console.log('   Days milestone:', days)
+      console.log('   Year:', CURRENT_YEAR)
+      console.log('   Sender address:', activeAddress)
+      console.log('   Transaction signer type:', typeof transactionSigner)
+
       showToast('Minting NFT badge...', 'info')
+
       const metadataUrl = getBadgeMetadataUrl(days, CURRENT_YEAR)
       console.log('📋 Metadata URL:', metadataUrl)
+      console.log('📋 Metadata URL type:', typeof metadataUrl)
 
+      console.log('🚀 Calling mintAchievementNFT...')
       const nftAssetId = await mintAchievementNFT(
         days,
         CURRENT_YEAR,
@@ -108,7 +178,17 @@ export default function ClaimModal ({
         transactionSigner
       )
 
-      console.log('✅ NFT minted successfully, Asset ID:', nftAssetId)
+      console.log('✅ NFT minted successfully!')
+      console.log('📊 Returned Asset ID:', nftAssetId)
+      console.log('📊 Asset ID type:', typeof nftAssetId)
+      console.log('📊 Asset ID is NaN?', Number.isNaN(nftAssetId))
+
+      // Ensure we have a valid number
+      if (typeof nftAssetId !== 'number' || Number.isNaN(nftAssetId)) {
+        console.warn('❌ Invalid asset ID returned:', nftAssetId)
+        throw new Error(`Invalid asset ID returned: ${nftAssetId}`)
+      }
+
       setAssetId(nftAssetId)
       setStep(3) // Success
 
@@ -116,6 +196,7 @@ export default function ClaimModal ({
       onSuccess()
 
       console.log('✅ Claim flow completed successfully!')
+      console.log('🎨 ========== NFT MINT PROCESS END ==========\n')
       showToast(`🎉 NFT claimed successfully!`, 'success')
 
       // Close modal after 3 seconds
@@ -123,15 +204,39 @@ export default function ClaimModal ({
         onClose()
       }, 3000)
     } catch (err: any) {
-      console.error('❌ Claim error:', err)
-      console.error('Error details:', {
-        message: err.message,
-        stack: err.stack,
-        name: err.name
-      })
-      setError(err.message || 'Failed to claim NFT badge')
+      console.warn('\n❌ ========== CLAIM ERROR ==========')
+      console.warn('❌ Error object:', err)
+      console.warn('❌ Error type:', typeof err)
+      console.warn('❌ Error constructor:', err?.constructor?.name)
+      console.warn('❌ Error message:', err?.message)
+      console.warn('❌ Error name:', err?.name)
+      console.warn('❌ Error stack:', err?.stack)
+
+      // Try to stringify error for more details
+      try {
+        const errorDetails = {
+          message: err?.message,
+          stack: err?.stack,
+          name: err?.name,
+          cause: err?.cause,
+          toString: err?.toString()
+        }
+        console.warn(
+          '📋 Error details (JSON):',
+          JSON.stringify(errorDetails, null, 2)
+        )
+      } catch (stringifyErr) {
+        console.warn('⚠️  Could not stringify error:', stringifyErr)
+      }
+
+      const errorMessage =
+        err?.message || err?.toString() || 'Failed to claim NFT badge'
+      console.warn('📤 Showing error to user:', errorMessage)
+      console.warn('❌ ========== END CLAIM ERROR ==========\n')
+
+      setError(errorMessage)
       setStep(1)
-      showToast(`Failed to claim badge: ${err.message}`, 'error')
+      showToast(`Failed to claim badge: ${errorMessage}`, 'error')
     }
   }
 

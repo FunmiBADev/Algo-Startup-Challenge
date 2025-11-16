@@ -33,7 +33,13 @@ export async function mintAchievementNFT(
   senderAddress: string,
   transactionSigner: algosdk.TransactionSigner
 ): Promise<number> {
-  console.log('🎨 Starting NFT mint for milestone:', milestone, 'year:', year)
+  console.log('\n🎨 ========== NFT SERVICE: MINT START ==========')
+  console.log('📊 Input parameters:')
+  console.log('   Milestone:', milestone, '(type:', typeof milestone, ')')
+  console.log('   Year:', year, '(type:', typeof year, ')')
+  console.log('   Metadata URL:', metadataUrl, '(type:', typeof metadataUrl, ')')
+  console.log('   Sender Address:', senderAddress, '(type:', typeof senderAddress, ')')
+  console.log('   Transaction Signer type:', typeof transactionSigner)
 
   // Get badge configuration
   const achievementType = getAchievementTypeByMilestone(milestone)
@@ -60,30 +66,103 @@ export async function mintAchievementNFT(
   const metadataHash = getMetadataHash(metadataUrl)
 
   console.log('📝 Creating NFT with metadata URL:', metadataUrl)
+  console.log('📝 Asset creation parameters:')
+  console.log('   total: 1n (BigInt)')
+  console.log('   decimals: 0')
+  console.log('   assetName:', assetName)
+  console.log('   unitName:', unitName)
+  console.log('   url:', metadataUrl)
+  console.log('   metadataHash length:', metadataHash.length)
 
   // Create NFT asset using algokit-utils
-  const createNFTResult = await algorand.send.assetCreate({
-    sender: senderAddress,
-    signer: transactionSigner,
-    total: 1n, // NFT: single copy
-    decimals: 0, // Indivisible
-    assetName,
-    unitName,
-    url: metadataUrl,
-    metadataHash,
-    defaultFrozen: false
-  })
+  let createNFTResult
+  try {
+    console.log('🚀 Calling algorand.send.assetCreate...')
+    createNFTResult = await algorand.send.assetCreate({
+      sender: senderAddress,
+      signer: transactionSigner,
+      total: 1n, // NFT: single copy
+      decimals: 0, // Indivisible
+      assetName,
+      unitName,
+      url: metadataUrl,
+      metadataHash,
+      defaultFrozen: false
+    })
+    console.log('✅ Asset creation call completed')
+  } catch (createError: any) {
+   console.warn('❌ Error during asset creation:')
+   console.warn('   Error type:', typeof createError)
+   console.warn('   Error message:', createError?.message)
+   console.warn('   Error stack:', createError?.stack)
+   console.warn('   Full error:', createError)
+    throw createError
+  }
 
-  console.log('✅ NFT created! Result:', createNFTResult)
+  console.log('✅ NFT created! Result received')
+  console.log('📊 createNFTResult type:', typeof createNFTResult)
+  console.log('📊 createNFTResult.assetId:', createNFTResult.assetId)
+  console.log('📊 createNFTResult.assetId type:', typeof createNFTResult.assetId)
 
   // Return the asset ID (converted from bigint to number)
   const assetId = createNFTResult.assetId
-  if (!assetId) {
+  console.log('🔍 Checking assetId...')
+  console.log('   assetId value:', assetId)
+  console.log('   assetId type:', typeof assetId)
+  console.log('   assetId is null?', assetId === null)
+  console.log('   assetId is undefined?', assetId === undefined)
+  
+  // Check for null/undefined explicitly (don't use !assetId with BigInt as BigInt(0) is falsy)
+  if (assetId === null || assetId === undefined) {
+   console.warn('❌ No assetId in createNFTResult (null or undefined)')
+    // BigInt can't be stringified, so convert it first
+    try {
+      const resultForLog: any = {}
+      for (const key in createNFTResult) {
+        const value = (createNFTResult as any)[key]
+        if (typeof value === 'bigint') {
+          resultForLog[key] = value.toString()
+        } else {
+          resultForLog[key] = value
+        }
+      }
+     console.warn('📋 Full result:', JSON.stringify(resultForLog, null, 2))
+    } catch (e) {
+     console.warn('📋 Result (stringified):', String(createNFTResult))
+     console.warn('📋 Stringify error:', e)
+    }
     throw new Error('Failed to get asset ID from transaction')
   }
 
-  const assetIdNumber = Number(assetId)
-  console.log('🎉 Asset ID:', assetIdNumber)
+  // Handle BigInt conversion properly
+  let assetIdNumber: number
+  if (typeof assetId === 'bigint') {
+    console.log('🔢 Converting BigInt to Number...')
+    assetIdNumber = Number(assetId)
+    console.log('🔢 BigInt value:', assetId.toString())
+    console.log('🔢 Number value:', assetIdNumber)
+  } else if (typeof assetId === 'number') {
+    console.log('🔢 AssetId is already a number')
+    assetIdNumber = assetId
+  } else if (typeof assetId === 'string') {
+    console.log('🔢 Converting string to Number...')
+    assetIdNumber = Number.parseInt(assetId, 10)
+  } else {
+   console.warn('❌ Unexpected assetId type:', typeof assetId)
+   console.warn('📋 AssetId value:', assetId)
+    // Try to convert anyway
+    assetIdNumber = Number(assetId)
+  }
+
+  if (Number.isNaN(assetIdNumber)) {
+   console.warn('❌ AssetId conversion resulted in NaN')
+   console.warn('📋 Original assetId:', assetId)
+    throw new Error(`Failed to convert asset ID to number: ${assetId}`)
+  }
+
+  console.log('🎉 Final Asset ID (number):', assetIdNumber)
+  console.log('✅ NFT SERVICE: MINT SUCCESS')
+  console.log('🎨 ========== NFT SERVICE: MINT END ==========\n')
 
   // Convert bigint to number for return value
   return assetIdNumber
