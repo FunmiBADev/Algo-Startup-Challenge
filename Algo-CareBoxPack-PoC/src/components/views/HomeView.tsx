@@ -230,7 +230,7 @@ export default function HomeView ({ onNavigate }: HomeViewProps) {
       <Card hover={false}>
         <SectionHeader
           icon={<HiChartBar className='h-6 w-6 text-sky-400' />}
-          title='Achievement Tracker'
+          title='Streak Tracker'
           action={
             <motion.div
               whileHover={{ rotate: 180 }}
