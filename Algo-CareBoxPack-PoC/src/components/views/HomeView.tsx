@@ -226,7 +226,7 @@ export default function HomeView ({ onNavigate }: HomeViewProps) {
         </div>
       </motion.div>
 
-      {/* Achievement Tracker Card */}
+      {/* Streak Tracker Card */}
       <Card hover={false}>
         <SectionHeader
           icon={<HiChartBar className='h-6 w-6 text-sky-400' />}
