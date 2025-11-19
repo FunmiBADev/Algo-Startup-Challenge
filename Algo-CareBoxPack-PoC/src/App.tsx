@@ -1,4 +1,5 @@
 import React from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import {
   SupportedWallet,
@@ -11,6 +12,8 @@ import { StreakProvider } from './contexts/StreakContext'
 import { ToastProvider, useToast } from './contexts/ToastContext'
 import ToastContainer from './components/ui/Toast'
 import Dashboard from './components/Dashboard'
+import AchievementsPage from './pages/AchievementsPage'
+import AchievementsMobileWebPage from './pages/AchievementsMobileWebPage'
 import {
   getAlgodConfigFromViteEnvironment,
   getKmdConfigFromViteEnvironment
@@ -20,8 +23,20 @@ function AppWithToasts () {
   const { toasts, removeToast } = useToast()
 
   return (
+    <Routes>
+      <Route path='/achievements' element={<AchievementsPage />} />
+      <Route path='/achievementsMobileWeb' element={<AchievementsMobileWebPage />} />
+      <Route path='/*' element={<Dashboard />} />
+    </Routes>
+  )
+}
+
+function AppWithProviders () {
+  const { toasts, removeToast } = useToast()
+
+  return (
     <>
-      <Dashboard />
+      <AppWithToasts />
       <ToastContainer toasts={toasts} onClose={removeToast} />
     </>
   )
@@ -65,15 +80,17 @@ export default function App () {
   })
 
   return (
-    <WalletProvider manager={walletManager}>
-      <ThemeProvider>
-        <StreakProvider>
-          <ToastProvider>
-            <AppWithToasts />
-            <Analytics />
-          </ToastProvider>
-        </StreakProvider>
-      </ThemeProvider>
-    </WalletProvider>
+    <BrowserRouter>
+      <WalletProvider manager={walletManager}>
+        <ThemeProvider>
+          <StreakProvider>
+            <ToastProvider>
+              <AppWithProviders />
+              <Analytics />
+            </ToastProvider>
+          </StreakProvider>
+        </ThemeProvider>
+      </WalletProvider>
+    </BrowserRouter>
   )
 }
