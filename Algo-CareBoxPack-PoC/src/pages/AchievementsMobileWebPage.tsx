@@ -14,21 +14,28 @@ export default function AchievementsMobileWebPage () {
   const [searchParams] = useSearchParams()
   const { syncFromMobile } = useStreak()
   const [hasSynced, setHasSynced] = React.useState(false)
-  const [showConsole, setShowConsole] = useState(false)
-  const [consoleLogs, setConsoleLogs] = useState<Array<{ type: string; message: string; timestamp: string }>>([])
 
-  // Capture console logs for mobile debugging
+  // Only enable console in development mode
+  const isDev = import.meta.env.DEV || import.meta.env.MODE === 'development'
+  const [showConsole, setShowConsole] = useState(false)
+  const [consoleLogs, setConsoleLogs] = useState<
+    Array<{ type: string; message: string; timestamp: string }>
+  >([])
+
+  // Capture console logs for mobile debugging (dev mode only)
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !isDev) return
 
     const originalLog = console.log
     const originalError = console.error
     const originalWarn = console.warn
 
     const addLog = (type: string, ...args: any[]) => {
-      const message = args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' ')
+      const message = args
+        .map(arg =>
+          typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+        )
+        .join(' ')
       setConsoleLogs(prev => [
         ...prev.slice(-49), // Keep last 50 logs
         { type, message, timestamp: new Date().toLocaleTimeString() }
@@ -61,7 +68,10 @@ export default function AchievementsMobileWebPage () {
   useEffect(() => {
     const source = searchParams.get('source')
     if (source === 'mobile-app' && !hasSynced) {
-      const currentStreak = parseInt(searchParams.get('currentStreak') || '0', 10)
+      const currentStreak = parseInt(
+        searchParams.get('currentStreak') || '0',
+        10
+      )
       const claimedBadgesParam = searchParams.get('claimedBadges')
       const reachedMilestonesParam = searchParams.get('reachedMilestones')
 
@@ -102,27 +112,31 @@ export default function AchievementsMobileWebPage () {
     <GradientBackground>
       <div className='min-h-screen relative'>
         <AchievementsViewMobileWeb />
-        
-        {/* Debug Console Toggle Button */}
-        <button
-          onClick={() => setShowConsole(!showConsole)}
-          className='fixed bottom-4 right-4 z-50 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold'
-          style={{ zIndex: 9999 }}
-        >
-          {showConsole ? 'Hide' : 'Show'} Console
-        </button>
 
-        {/* Debug Console Panel */}
-        {showConsole && (
+        {/* Debug Console Toggle Button - Dev Mode Only */}
+        {isDev && (
+          <button
+            onClick={() => setShowConsole(!showConsole)}
+            className='fixed bottom-4 right-4 z-50 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold'
+            style={{ zIndex: 9999 }}
+          >
+            {showConsole ? 'Hide' : 'Show'} Console
+          </button>
+        )}
+
+        {/* Debug Console Panel - Dev Mode Only */}
+        {isDev && showConsole && (
           <div
             className='fixed bottom-16 right-4 left-4 bg-black/95 border border-gray-700 rounded-lg shadow-2xl z-50'
-            style={{ 
+            style={{
               maxHeight: '60vh',
               zIndex: 9998
             }}
           >
             <div className='flex items-center justify-between p-3 border-b border-gray-700'>
-              <h3 className='text-white font-semibold'>Console Logs ({consoleLogs.length})</h3>
+              <h3 className='text-white font-semibold'>
+                Console Logs ({consoleLogs.length})
+              </h3>
               <button
                 onClick={() => setConsoleLogs([])}
                 className='text-gray-400 hover:text-white text-sm'
@@ -130,7 +144,10 @@ export default function AchievementsMobileWebPage () {
                 Clear
               </button>
             </div>
-            <div className='overflow-y-auto p-3' style={{ maxHeight: 'calc(60vh - 50px)' }}>
+            <div
+              className='overflow-y-auto p-3'
+              style={{ maxHeight: 'calc(60vh - 50px)' }}
+            >
               {consoleLogs.length === 0 ? (
                 <p className='text-gray-500 text-sm'>No logs yet...</p>
               ) : (
@@ -146,15 +163,23 @@ export default function AchievementsMobileWebPage () {
                           : 'bg-gray-800/50 text-gray-300'
                       }`}
                     >
-                      <span className='text-gray-500 text-xs'>{log.timestamp}</span>
-                      <span className={`ml-2 ${
-                        log.type === 'error' ? 'text-red-400' : 
-                        log.type === 'warn' ? 'text-yellow-400' : 
-                        'text-blue-400'
-                      }`}>
+                      <span className='text-gray-500 text-xs'>
+                        {log.timestamp}
+                      </span>
+                      <span
+                        className={`ml-2 ${
+                          log.type === 'error'
+                            ? 'text-red-400'
+                            : log.type === 'warn'
+                            ? 'text-yellow-400'
+                            : 'text-blue-400'
+                        }`}
+                      >
                         [{log.type.toUpperCase()}]
                       </span>
-                      <div className='mt-1 break-words whitespace-pre-wrap'>{log.message}</div>
+                      <div className='mt-1 break-words whitespace-pre-wrap'>
+                        {log.message}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -166,4 +191,3 @@ export default function AchievementsMobileWebPage () {
     </GradientBackground>
   )
 }
-
