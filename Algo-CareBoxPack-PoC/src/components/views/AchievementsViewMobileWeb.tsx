@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { ViewId } from '../../types'
+import React, { useState, useEffect } from 'react'
 import { useStreak } from '../../contexts/StreakContext'
 import { ACHIEVEMENTS } from '../../constants/achievements'
 import ClaimModal from '../modals/ClaimModal'
@@ -8,7 +7,6 @@ import SectionHeader from '../ui/SectionHeader'
 import {
   HiLockClosed,
   HiGift,
-  HiArrowLeft,
   HiChevronDown,
   HiChevronUp
 } from 'react-icons/hi'
@@ -22,13 +20,12 @@ import {
   CURRENT_YEAR
 } from '../../config/achievementBadges'
 
-interface AchievementsViewProps {
-  onNavigate: (view: ViewId) => void
-}
-
-export default function AchievementsView ({
-  onNavigate
-}: AchievementsViewProps) {
+/**
+ * Mobile-optimized Achievements View for WebView
+ * Removed "Back to Settings" navigation for mobile app integration
+ * Designed to match mobile app's GradientBackground styling
+ */
+export default function AchievementsViewMobileWeb () {
   const {
     currentStreak,
     currentYear,
@@ -42,6 +39,21 @@ export default function AchievementsView ({
   const [showClaimModal, setShowClaimModal] = useState(false)
   const [selectedDays, setSelectedDays] = useState(0)
   const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set())
+  const [connectionError, setConnectionError] = useState<string | null>(null)
+  const [isConnecting, setIsConnecting] = useState(false)
+
+  // Log wallet availability on mount
+  useEffect(() => {
+    console.log('🔍 Wallet availability check:', {
+      walletsCount: wallets?.length || 0,
+      wallets: wallets?.map(w => ({
+        id: w.id,
+        name: w.metadata.name,
+        isActive: w.isActive
+      })),
+      activeAddress
+    })
+  }, [wallets, activeAddress])
 
   // Helper to ellipse address
   const ellipseAddress = (address: string, width = 6): string => {
@@ -109,8 +121,6 @@ export default function AchievementsView ({
     if (!ipfsUrl || !ipfsUrl.startsWith('ipfs://')) return null
 
     // Use Pinata gateway or public gateway
-    // ipfs://bafybeihmv5ec4bimu5yld5wfadc7a6yurlbkpnimiv7uq3ti54eejrwkze/10DaysGetStartedPOC.png
-    // Keep the full path for directory structures
     const ipfsPath = ipfsUrl.replace('ipfs://', '')
     return `https://gateway.pinata.cloud/ipfs/${ipfsPath}`
   }
@@ -248,19 +258,9 @@ export default function AchievementsView ({
   }
 
   return (
-    <div className='view-content space-y-8'>
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        onClick={() => onNavigate('settings')}
-        className='flex items-center text-sky-400 hover:text-sky-300 transition-colors group'
-      >
-        <HiArrowLeft className='h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform' />
-        <span>Back to Settings</span>
-      </motion.button>
-
-      {/* Wallet Connection Status Bar */}
-      {activeAddress && (
+    <div className='view-content space-y-8 p-4 md:p-8'>
+      {/* Wallet Connection Status Bar or Connect Button */}
+      {activeAddress ? (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -286,6 +286,107 @@ export default function AchievementsView ({
             >
               Disconnect
             </motion.button>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='card-bg p-6 rounded-xl border border-yellow-500/30 bg-gradient-to-r from-yellow-900/20 to-orange-900/20'
+        >
+          <div className='space-y-4'>
+            <div className='flex items-center gap-3'>
+              <div className='w-3 h-3 rounded-full bg-yellow-500 animate-pulse' />
+              <div>
+                <div className='text-sm font-semibold text-yellow-400'>
+                  Wallet Not Connected
+                </div>
+                <div className='text-xs text-gray-400'>
+                  Connect your wallet to claim NFT badges
+                </div>
+              </div>
+            </div>
+            <div className='flex flex-col gap-3'>
+              {connectionError && (
+                <div className='p-3 bg-red-500/20 border border-red-500/50 rounded-lg mb-2'>
+                  <p className='text-red-300 text-sm'>{connectionError}</p>
+                </div>
+              )}
+              {wallets && wallets.length > 0 ? (
+                wallets.map(wallet => (
+                  <motion.button
+                    key={wallet.id}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={async () => {
+                      setIsConnecting(true)
+                      setConnectionError(null)
+                      try {
+                        console.log(
+                          '🔌 Attempting to connect wallet:',
+                          wallet.metadata.name
+                        )
+                        console.log('📱 Wallet details:', {
+                          id: wallet.id,
+                          isActive: wallet.isActive,
+                          metadata: wallet.metadata
+                        })
+                        await wallet.connect()
+                        console.log('✅ Wallet connection successful')
+                        setIsConnecting(false)
+                      } catch (error: any) {
+                        console.error('❌ Wallet connection error:', error)
+                        setIsConnecting(false)
+                        const errorMessage =
+                          error?.message || error?.toString() || 'Unknown error'
+                        setConnectionError(
+                          `Failed to connect: ${errorMessage}. Please make sure the wallet app is installed and try again.`
+                        )
+                      }
+                    }}
+                    disabled={isConnecting || wallet.isActive}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all border ${
+                      wallet.isActive
+                        ? 'bg-green-900/30 border-green-500/50 cursor-not-allowed opacity-75'
+                        : isConnecting
+                        ? 'bg-neutral-700/30 border-neutral-500/50 cursor-wait'
+                        : 'bg-neutral-700/50 hover:bg-neutral-600/50 border-transparent hover:border-sky-500'
+                    }`}
+                  >
+                    {wallet.metadata.icon && (
+                      <img
+                        alt={`${wallet.metadata.name} icon`}
+                        src={wallet.metadata.icon}
+                        className='w-10 h-10 object-contain rounded-lg'
+                      />
+                    )}
+                    <span className='font-semibold text-lg flex-1 text-left text-white'>
+                      {wallet.metadata.name}
+                    </span>
+                    {isConnecting && !wallet.isActive && (
+                      <span className='text-yellow-400 text-sm animate-pulse'>
+                        Connecting...
+                      </span>
+                    )}
+                    {wallet.isActive && (
+                      <span className='text-green-400 text-sm'>
+                        ✓ Connected
+                      </span>
+                    )}
+                  </motion.button>
+                ))
+              ) : (
+                <div className='space-y-2'>
+                  <p className='text-yellow-400 text-sm text-center py-2'>
+                    No wallets detected. Please install Pera or Defly wallet.
+                  </p>
+                  <p className='text-gray-500 text-xs text-center'>
+                    Make sure you have Pera Wallet or Defly Wallet installed on
+                    your device.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </motion.div>
       )}

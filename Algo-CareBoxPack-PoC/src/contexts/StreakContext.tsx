@@ -27,6 +27,11 @@ interface StreakContextType {
   getArchivedReached: (year: number) => Set<number>
   hasReceivedOnboardingAirdrop: () => boolean
   markOnboardingAirdropReceived: () => void
+  syncFromMobile: (data: {
+    currentStreak: number
+    claimedBadges: number[]
+    reachedMilestones: number[]
+  }) => void
 }
 
 const StreakContext = createContext<StreakContextType | undefined>(undefined)
@@ -329,6 +334,40 @@ export function StreakProvider ({ children }: StreakProviderProps) {
     localStorage.setItem('hasReceivedOnboardingAirdrop', 'true')
   }
 
+  // Sync data from mobile app - updates both state and localStorage
+  const syncFromMobile = (data: {
+    currentStreak: number
+    claimedBadges: number[]
+    reachedMilestones: number[]
+  }) => {
+    console.log('Syncing data from mobile app:', data)
+
+    // Update streak
+    if (data.currentStreak > 0) {
+      setStreak(data.currentStreak)
+    }
+
+    // Update claimed badges
+    if (data.claimedBadges && data.claimedBadges.length > 0) {
+      const badgesSet = new Set(data.claimedBadges)
+      setClaimedBadges(badgesSet)
+      localStorage.setItem(
+        `claimedBadges_${currentYear}`,
+        JSON.stringify([...badgesSet])
+      )
+    }
+
+    // Update reached milestones
+    if (data.reachedMilestones && data.reachedMilestones.length > 0) {
+      const milestonesSet = new Set(data.reachedMilestones)
+      setReachedMilestones(milestonesSet)
+      localStorage.setItem(
+        `reachedMilestones_${currentYear}`,
+        JSON.stringify([...milestonesSet])
+      )
+    }
+  }
+
   return (
     <StreakContext.Provider
       value={{
@@ -346,7 +385,8 @@ export function StreakProvider ({ children }: StreakProviderProps) {
         getArchivedBadges,
         getArchivedReached,
         hasReceivedOnboardingAirdrop,
-        markOnboardingAirdropReceived
+        markOnboardingAirdropReceived,
+        syncFromMobile
       }}
     >
       {children}
