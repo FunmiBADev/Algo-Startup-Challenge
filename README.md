@@ -145,7 +145,7 @@ Make sure `VITE_API_URL=http://localhost:3001` in frontend `.env`
 
 Both frontend and backend are deployed separately on Vercel:
 
-- **Frontend**: https://algo-careboxpack-poc.vercel.app
+- **Frontend**: https://carebox-pack-algo-startup-challenge.vercel.app
 - **Backend**: https://algo-nft-backend.vercel.app
 
 See `docs/4-vercel-deployment.md` for detailed deployment instructions.
